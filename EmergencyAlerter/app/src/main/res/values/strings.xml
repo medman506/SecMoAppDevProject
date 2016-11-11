@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Emergency Alerter</string>
     <string name="title_activity_map">MapActivity</string>
+    <string name="nearby_police_stations">Police stations nearby</string>
     <string name="show_police_stations">Show police stations nearby</string>
-    <string name="police_stations_nearby">Looking for nearby police stations...</string>
+    <string name="nearby_police_stations_looking">Looking for nearby police stations...</string>
 </resources>

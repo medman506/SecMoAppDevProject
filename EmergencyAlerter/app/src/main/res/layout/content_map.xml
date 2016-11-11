@@ -16,6 +16,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/police_stations_nearby" />
+        android:text="@string/nearby_police_stations_looking" />
 
 </RelativeLayout>
