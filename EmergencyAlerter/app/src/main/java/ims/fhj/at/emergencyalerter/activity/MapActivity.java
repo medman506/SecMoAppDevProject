@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -76,5 +77,6 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e(TAG, "Connection to Google Places API failed");
+        Toast.makeText(this, "Unfortunately, we were not able to establish a connection with Google Places", Toast.LENGTH_LONG).show();
     }
 }
