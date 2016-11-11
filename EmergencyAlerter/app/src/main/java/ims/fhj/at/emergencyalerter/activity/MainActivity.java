@@ -1,8 +1,10 @@
-package ims.fhj.at.emergencyalerter;
+package ims.fhj.at.emergencyalerter.activity;
 
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import ims.fhj.at.emergencyalerter.R;
 
 public class MainActivity extends AppCompatActivity {
 
