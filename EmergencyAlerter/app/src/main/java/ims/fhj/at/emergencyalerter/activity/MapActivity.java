@@ -4,24 +4,15 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResolvingResultCallbacks;
-import com.google.android.gms.common.api.ResultCallbacks;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -29,15 +20,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.Map;
-
-import ims.fhj.at.emergencyalerter.Manifest;
 import ims.fhj.at.emergencyalerter.R;
+import ims.fhj.at.emergencyalerter.api.GooglePlacesReadTask;
 import ims.fhj.at.emergencyalerter.util.App;
 
 public class MapActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
 
     public static String TAG = "MapActivity";
+
+    // proximity radius for Google Places API
+    private static double PROXIMITY_RADIUS = 5000;
+
+    private static double DEMO_LAT = 47.090637;
+    private static double DEMO_LONG = 15.4169279;
+
+    private GoogleMap googleMap;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -140,31 +137,26 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     private void searchPoliceStationsNearbyPermissionGranted() {
         Log.d(TAG, "now we really search for police stations nearby");
 
-        try {
-            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-                    .getCurrentPlace(mGoogleApiClient, null);
+        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googlePlacesUrl.append("location=" + DEMO_LAT + "," + DEMO_LONG);
+        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+        googlePlacesUrl.append("&types=" + App.GOOGLE_PLACES_QUERY_TYPE);
+        googlePlacesUrl.append("&sensors=true");
+        googlePlacesUrl.append("&key=" + App.GOOGLE_API_KEY);
 
-            result.setResultCallback(new ResultCallbacks<PlaceLikelihoodBuffer>() {
-                @Override
-                public void onSuccess(@NonNull PlaceLikelihoodBuffer placeLikelihoods) {
-                    for (PlaceLikelihood placeLikelihood : placeLikelihoods) {
-                        Log.i(TAG, String.format("Place '%s' has likelihood: %g",
-                                placeLikelihood.getPlace().getName(),
-                                placeLikelihood.getLikelihood()));
-                    }
-                    placeLikelihoods.release();
-                }
+        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this, googlePlacesUrl.toString(), new GooglePlacesReadTask.OnTaskDoneListener() {
+            @Override
+            public void onTaskDone(String response) {
+                Log.d(TAG, "received response: " + response);
+            }
 
-                @Override
-                public void onFailure(@NonNull Status status) {
-                    Log.e(TAG, status.toString());
-                }
-            });
-        } catch (SecurityException e) {
-            e.printStackTrace();
+            @Override
+            public void onError() {
+                Log.e(TAG, "retrieve error");
+            }
+        });
 
-            searchPoliceStationsNearbyPermissionDenied();
-        }
+        googlePlacesReadTask.execute("GO!");
     }
 
     private void searchPoliceStationsNearbyPermissionDenied() {
@@ -172,7 +164,9 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
+
         googleMap.addMarker(new MarkerOptions()
             .position(new LatLng(0, 0))
             .title("Marker"));
