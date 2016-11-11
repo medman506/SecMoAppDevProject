@@ -9,4 +9,7 @@ public class App {
     // All app constants can go here
     public static final String DUMMY = "dummy_constant";
 
+    // Permission requests
+    public static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
+
 }
