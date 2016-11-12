@@ -21,9 +21,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // set title bar to a red color
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.flamingo)));
-
         // button to navigate to map activity
         btnToMapActivity = (Button) findViewById(R.id.to_map_activity);
         btnToMapActivity.setOnClickListener(new View.OnClickListener() {
