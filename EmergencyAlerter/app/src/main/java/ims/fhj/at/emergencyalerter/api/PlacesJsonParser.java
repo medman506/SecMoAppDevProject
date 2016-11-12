@@ -74,11 +74,11 @@ public class PlacesJsonParser {
                 vicinity = googlePlacesJson.getString("vicinity");
             }
 
-            if (!googlePlacesJson.isNull("geometry") && !googlePlacesJson.isNull("location") && !googlePlacesJson.isNull("lat")) {
+            if (!googlePlacesJson.isNull("geometry") && !googlePlacesJson.getJSONObject("geometry").isNull("location") && !googlePlacesJson.getJSONObject("geometry").getJSONObject("location").isNull("lat")) {
                 latitude = googlePlacesJson.getJSONObject("geometry").getJSONObject("location").getString("lat");
             }
 
-            if (!googlePlacesJson.isNull("geometry") && !googlePlacesJson.isNull("location") && !googlePlacesJson.isNull("lng")) {
+            if (!googlePlacesJson.isNull("geometry") && !googlePlacesJson.getJSONObject("geometry").isNull("location") && !googlePlacesJson.getJSONObject("geometry").getJSONObject("location").isNull("lng")) {
                 longitude = googlePlacesJson.getJSONObject("geometry").getJSONObject("location").getString("lng");
             }
 
@@ -91,7 +91,7 @@ public class PlacesJsonParser {
             googlePlaceMap.put("icon_link", iconLink);
             googlePlaceMap.put("vicinity", vicinity);
             googlePlaceMap.put("lat", latitude);
-            googlePlaceMap.put("long", longitude);
+            googlePlaceMap.put("lng", longitude);
             googlePlaceMap.put("reference", reference);
         } catch (JSONException e) {
             e.printStackTrace();

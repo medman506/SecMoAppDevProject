@@ -14,10 +14,12 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
@@ -41,7 +43,7 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     private static double DEMO_LAT = 47.090637;
     private static double DEMO_LONG = 15.4169279;
 
-    private GoogleMap googleMap;
+    private GoogleMap googleMap = null;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -165,7 +167,11 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
                     JSONObject jsonResponse = new JSONObject(response);
                     placesData = placesJsonParser.parse(jsonResponse);
 
+                    // display markers on map
                     displayMarkersOnMap(placesData);
+
+                    // zoom camera in
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(DEMO_LAT, DEMO_LONG), 12.0f));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -185,19 +191,31 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     private void displayMarkersOnMap(List<HashMap<String, String>> mapData) {
-        int listSize = mapData.size();
-
         for (HashMap<String, String> item : mapData) {
-            Log.d(TAG, "Place name: " + item.get("place_name"));
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            try {
+                double lat = Double.parseDouble(item.get("lat"));
+                double lng = Double.parseDouble(item.get("lng"));
+                String placeName = item.get("place_name");
+                String vicinity = item.get("vicinity");
+
+                LatLng latLng = new LatLng(lat, lng);
+                markerOptions.position(latLng);
+                markerOptions.title(placeName);
+
+                if (googleMap != null) {
+                    googleMap.addMarker(markerOptions);
+                }
+            } catch (Exception e) {
+                Log.d(TAG, "failed to parse: " + item.get("place_name"));
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
-
-        googleMap.addMarker(new MarkerOptions()
-            .position(new LatLng(0, 0))
-            .title("Marker"));
     }
 }
