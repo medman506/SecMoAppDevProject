@@ -19,7 +19,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
@@ -40,15 +39,19 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     // proximity radius for Google Places API
     private static double PROXIMITY_RADIUS = 5000;
 
+    // dummy values (=> Graz, in case we are not allowed to access the user's location we just use these)
     private static double DEMO_LAT = 47.090637;
     private static double DEMO_LONG = 15.4169279;
 
+    // Google Maps object
     private GoogleMap googleMap = null;
 
+    // Google API client
     private GoogleApiClient mGoogleApiClient;
 
-    // hash map to store API response
-    private List<HashMap<String, String>> googlePlacesList;
+    // position
+    private double lat;
+    private double lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,11 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // init lat and long with dummy values (Graz)
+        // TODO replace with real current location / refactor to listen for location updates
+        lat = DEMO_LAT;
+        lng = DEMO_LONG;
 
         // set action bar title
         getSupportActionBar().setTitle(getResources().getString(R.string.nearby_police_stations));
@@ -73,15 +81,6 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
     }
 
     @Override
@@ -150,7 +149,7 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
         Log.d(TAG, "now we really search for police stations nearby");
 
         StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        googlePlacesUrl.append("location=" + DEMO_LAT + "," + DEMO_LONG);
+        googlePlacesUrl.append("location=" + lat + "," + lng);
         googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
         googlePlacesUrl.append("&types=" + App.GOOGLE_PLACES_QUERY_TYPE);
         googlePlacesUrl.append("&sensors=true");
