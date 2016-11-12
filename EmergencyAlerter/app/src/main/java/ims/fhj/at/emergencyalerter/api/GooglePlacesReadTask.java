@@ -2,6 +2,7 @@ package ims.fhj.at.emergencyalerter.api;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 
@@ -19,6 +20,8 @@ import javax.net.ssl.HttpsURLConnection;
  */
 
 public class GooglePlacesReadTask extends AsyncTask<String, Integer, String> {
+
+    private static String TAG = "GooglePlacesReadTask";
 
     private Context context;
     private OnTaskDoneListener onTaskDoneListener;
@@ -58,6 +61,20 @@ public class GooglePlacesReadTask extends AsyncTask<String, Integer, String> {
                 reader.close();
 
                 return builder.toString();
+            } else {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getErrorStream()));
+                StringBuilder builder = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line + "\n");
+                }
+
+                reader.close();
+
+                Log.e(TAG, "Error response: " + builder.toString());
+
+                return null;
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
