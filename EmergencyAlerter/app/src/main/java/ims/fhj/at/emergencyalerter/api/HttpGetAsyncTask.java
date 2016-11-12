@@ -19,15 +19,15 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by michael.stifter on 11.11.2016.
  */
 
-public class GooglePlacesReadTask extends AsyncTask<String, Integer, String> {
+public class HttpGetAsyncTask extends AsyncTask<String, Integer, String> {
 
-    private static String TAG = "GooglePlacesReadTask";
+    private static String TAG = "HttpGetAsyncTask";
 
     private Context context;
     private OnTaskDoneListener onTaskDoneListener;
     private String urlString = "";
 
-    public GooglePlacesReadTask(Context context, String url, OnTaskDoneListener onTaskDoneListener) {
+    public HttpGetAsyncTask(Context context, String url, OnTaskDoneListener onTaskDoneListener) {
         this.context = context;
         this.urlString = url;
         this.onTaskDoneListener = onTaskDoneListener;

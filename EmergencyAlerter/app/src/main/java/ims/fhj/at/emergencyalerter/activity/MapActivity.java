@@ -20,8 +20,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
+
 import ims.fhj.at.emergencyalerter.R;
-import ims.fhj.at.emergencyalerter.api.GooglePlacesReadTask;
+import ims.fhj.at.emergencyalerter.api.HttpGetAsyncTask;
+import ims.fhj.at.emergencyalerter.api.PlacesJsonParser;
 import ims.fhj.at.emergencyalerter.util.App;
 
 public class MapActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
@@ -37,6 +44,9 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     private GoogleMap googleMap;
 
     private GoogleApiClient mGoogleApiClient;
+
+    // hash map to store API response
+    private List<HashMap<String, String>> googlePlacesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,10 +154,21 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
         googlePlacesUrl.append("&sensors=true");
         googlePlacesUrl.append("&key=" + App.GOOGLE_API_KEY);
 
-        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this, googlePlacesUrl.toString(), new GooglePlacesReadTask.OnTaskDoneListener() {
+        HttpGetAsyncTask httpGetAsyncTask = new HttpGetAsyncTask(this, googlePlacesUrl.toString(), new HttpGetAsyncTask.OnTaskDoneListener() {
             @Override
             public void onTaskDone(String response) {
-                Log.d(TAG, "received response: " + response);
+                // parse JSON
+                PlacesJsonParser placesJsonParser = new PlacesJsonParser();
+                List<HashMap<String, String>> placesData = null;
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(response);
+                    placesData = placesJsonParser.parse(jsonResponse);
+
+                    displayMarkersOnMap(placesData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -156,11 +177,19 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
             }
         });
 
-        googlePlacesReadTask.execute("GO!");
+        httpGetAsyncTask.execute("GO!");
     }
 
     private void searchPoliceStationsNearbyPermissionDenied() {
         Toast.makeText(this, "Unfortunately, we are not able to show you nearby police stations if you do not permit us to access your location", Toast.LENGTH_LONG).show();
+    }
+
+    private void displayMarkersOnMap(List<HashMap<String, String>> mapData) {
+        int listSize = mapData.size();
+
+        for (HashMap<String, String> item : mapData) {
+            Log.d(TAG, "Place name: " + item.get("place_name"));
+        }
     }
 
     @Override
