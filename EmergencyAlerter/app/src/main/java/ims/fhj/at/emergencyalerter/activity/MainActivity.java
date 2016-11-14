@@ -15,6 +15,8 @@ import ims.fhj.at.emergencyalerter.R;
 public class MainActivity extends AppCompatActivity {
 
     private Button btnToMapActivity;
+    private Button btnToSettingsActivity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent mapActivityIntent = new Intent(MainActivity.this, MapActivity.class);
                 startActivity(mapActivityIntent);
+            }
+        });
+
+        // button to settings
+        btnToSettingsActivity = (Button) findViewById(R.id.to_settings_activity);
+        btnToSettingsActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent settingsActivityIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsActivityIntent);
             }
         });
     }
