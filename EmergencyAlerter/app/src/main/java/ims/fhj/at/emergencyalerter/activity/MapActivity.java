@@ -1,6 +1,8 @@
 package ims.fhj.at.emergencyalerter.activity;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,14 +32,16 @@ import java.util.List;
 import ims.fhj.at.emergencyalerter.R;
 import ims.fhj.at.emergencyalerter.api.HttpGetAsyncTask;
 import ims.fhj.at.emergencyalerter.api.PlacesJsonParser;
+import ims.fhj.at.emergencyalerter.service.LocationService;
 import ims.fhj.at.emergencyalerter.util.App;
+import ims.fhj.at.emergencyalerter.util.LocationTracker;
 
 public class MapActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
 
     public static String TAG = "MapActivity";
 
     // proximity radius for Google Places API
-    private static double PROXIMITY_RADIUS = 5000;
+    private static double PROXIMITY_RADIUS = 20000;
 
     // dummy values (=> Graz, in case we are not allowed to access the user's location we just use these)
     private static double DEMO_LAT = 47.090637;
@@ -53,17 +57,16 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     private double lat;
     private double lng;
 
+    // location
+    private Location currentLocation;
+    private LocationTracker locationTracker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // init lat and long with dummy values (Graz)
-        // TODO replace with real current location / refactor to listen for location updates
-        lat = DEMO_LAT;
-        lng = DEMO_LONG;
 
         // set action bar title
         getSupportActionBar().setTitle(getResources().getString(R.string.nearby_police_stations));
@@ -81,6 +84,11 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+
+        // get current location from location tracker
+        locationTracker = LocationTracker.getInstance();
+        currentLocation = locationTracker.getLocation();
+        Log.d(TAG, "current location: " + currentLocation.toString());
     }
 
     @Override
@@ -149,7 +157,7 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
         Log.d(TAG, "now we really search for police stations nearby");
 
         StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        googlePlacesUrl.append("location=" + lat + "," + lng);
+        googlePlacesUrl.append("location=" + currentLocation.getLatitude() + "," + currentLocation.getLongitude());
         googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
         googlePlacesUrl.append("&types=" + App.GOOGLE_PLACES_QUERY_TYPE);
         googlePlacesUrl.append("&sensors=true");
@@ -169,8 +177,16 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
                     // display markers on map
                     displayMarkersOnMap(placesData);
 
+                    // build latlng
+
                     // zoom camera in
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(DEMO_LAT, DEMO_LONG), 12.0f));
+
+                    // DEMO values
+                    //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(DEMO_LAT, DEMO_LONG), 12.0f));
+
+                    // real stuff
+                    LatLng latlng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 12.0f));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

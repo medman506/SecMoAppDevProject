@@ -8,7 +8,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import ims.fhj.at.emergencyalerter.util.App;
 
 public class LocationService extends Service {
 
@@ -33,7 +36,7 @@ public class LocationService extends Service {
     {
         Log.d(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -64,15 +67,16 @@ public class LocationService extends Service {
     }
 
     @Override
-    public void onDestroy()
-    {
-        Log.e(TAG, "onDestroy");
+    public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy");
         if (locationManager != null) {
             for (int i = 0; i < locationListeners.length; i++) {
                 try {
                     // TODO handle permissions?
-                    //locationManager.removeUpdates(locationListeners[i]);
+                    locationManager.removeUpdates(locationListeners[i]);
+                } catch (SecurityException s) {
+                    Log.i(TAG, "fail to remove location listener", s);
                 } catch (Exception ex) {
                     Log.i(TAG, "fail to remove location listners, ignore", ex);
                 }
@@ -100,6 +104,12 @@ public class LocationService extends Service {
         public void onLocationChanged(Location location) {
             Log.d(TAG, "Location update: " + location);
             lastKnownLocation.set(location);
+
+            // send location update broadcast
+            Intent i = new Intent(App.BROADCAST_LOCATION_UPDATE);
+            i.putExtra(App.EXTRA_LATITUDE, location.getLatitude());
+            i.putExtra(App.EXTRA_LONGITUDE, location.getLongitude());
+            sendBroadcast(i);
         }
 
         @Override

@@ -20,4 +20,10 @@ public class App {
     public static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
     public static final int PERMISSION_REQUEST_CALL_PHONE = 2;
 
+    // Location service broadcast
+    public static final String BROADCAST_LOCATION_UPDATE = "ims.fhj.at.emergencyalerter.LOCATION_UPDATE";
+
+    public static final String EXTRA_LATITUDE = "lat";
+    public static final String EXTRA_LONGITUDE = "lng";
+
 }
