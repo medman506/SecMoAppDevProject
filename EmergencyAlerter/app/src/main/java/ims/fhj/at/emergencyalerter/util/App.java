@@ -26,4 +26,7 @@ public class App {
     public static final String EXTRA_LATITUDE = "lat";
     public static final String EXTRA_LONGITUDE = "lng";
 
+    public final static double DEMO_LAT_GRAZ = 47.090637;
+    public final static double DEMO_LONG_GRAZ = 15.4169279;
+
 }

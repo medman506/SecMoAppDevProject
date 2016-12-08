@@ -15,7 +15,7 @@ public class LocationTracker {
     private Location lastKnownLocation = null;
 
     private LocationTracker() {
-
+        init();
     }
 
     public void setLocation(Location location) {
@@ -24,5 +24,12 @@ public class LocationTracker {
 
     public Location getLocation() {
         return lastKnownLocation;
+    }
+
+    private void init() {
+        // init location with default value
+        lastKnownLocation = new Location("");
+        lastKnownLocation.setLatitude(App.DEMO_LAT_GRAZ);
+        lastKnownLocation.setLongitude(App.DEMO_LONG_GRAZ);
     }
 }

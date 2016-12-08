@@ -93,7 +93,7 @@ public class LocationService extends Service {
 
     private class EmergencyLocationListener implements android.location.LocationListener {
 
-        private Location lastKnownLocation;
+        private Location lastKnownLocation = null;
 
         public EmergencyLocationListener(String provider) {
             Log.d(TAG, "Location Provider: " + provider);
