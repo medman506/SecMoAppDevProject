@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -41,7 +42,7 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
     public static String TAG = "MapActivity";
 
     // proximity radius for Google Places API
-    private static double PROXIMITY_RADIUS = 20000;
+    private static double PROXIMITY_RADIUS = 40000;
 
     // dummy values (=> Graz, in case we are not allowed to access the user's location we just use these)
     private static double DEMO_LAT = 47.090637;
@@ -177,6 +178,9 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
                     // display markers on map
                     displayMarkersOnMap(placesData);
 
+                    // display own position on map
+                    displayOwnPositionOnMap();
+
                     // build latlng
 
                     // zoom camera in
@@ -219,6 +223,9 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 markerOptions.position(latLng);
                 markerOptions.title(placeName);
 
+                // set color of police stations to blue (azure)
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+
                 if (googleMap != null) {
                     googleMap.addMarker(markerOptions);
                 }
@@ -226,6 +233,18 @@ public class MapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 Log.d(TAG, "failed to parse: " + item.get("place_name"));
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void displayOwnPositionOnMap() {
+        MarkerOptions markerOptions = new MarkerOptions();
+
+        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        markerOptions.position(latLng);
+        markerOptions.title("Your current location");
+
+        if (googleMap != null) {
+            googleMap.addMarker(markerOptions);
         }
     }
 
