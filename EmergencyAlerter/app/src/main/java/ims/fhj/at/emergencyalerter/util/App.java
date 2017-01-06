@@ -8,9 +8,10 @@ public class App {
 
     // All app constants can go here
     public static final String DUMMY = "dummy_constant";
+    public static final String SETTING_EMGERGENCY_NUMBER = "emergencyNumber";
 
     // Emergency number to call
-    public static final String EMERGENCY_PHONE_NUMBER = "tel:989898989898";
+    public static final String EMERGENCY_PHONE_NUMBER_DEFAULT = "0900666666";
 
     // Google constants
     public static final String GOOGLE_API_KEY = "AIzaSyDyGHM8lcNSX3RUrmSvYoTNX52vSlFKb3g";

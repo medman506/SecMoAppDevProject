@@ -35,14 +35,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_weight="1.0"
         android:orientation="vertical">
 
         <Button
             android:id="@+id/addContact_btn"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/add_contact" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10px"
+            android:inputType="phone"
+            android:ems="10"
+            android:id="@+id/emergencyNumber_input"
+            android:text="Set at runtime" />
+
+        <Button
+            android:text="Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/setNumber_btn" />
     </LinearLayout>
 
 </LinearLayout>

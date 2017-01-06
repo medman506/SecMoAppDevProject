@@ -1,8 +1,10 @@
 package ims.fhj.at.emergencyalerter.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,24 +13,31 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import ims.fhj.at.emergencyalerter.R;
 import ims.fhj.at.emergencyalerter.adapter.ContactViewAdapter;
 import ims.fhj.at.emergencyalerter.model.Contact;
+import ims.fhj.at.emergencyalerter.util.App;
 import ims.fhj.at.emergencyalerter.util.DatabaseUtil;
 
 public class SettingsActivity extends AppCompatActivity {
 
     private Button btnContact;
+    private Button btnNumber;
+    private EditText tvNumber;
+
     private static final int RESULT_PICK_CONTACT = 1001;
     //Custom list for displaying tasks
     private ListView list;
     private ArrayList<Contact> contactList;
     private ContactViewAdapter adapter;
 
+    private SharedPreferences pref;
     private DatabaseUtil dbUtil;
 
     @Override
@@ -54,6 +63,26 @@ public class SettingsActivity extends AppCompatActivity {
                 pickContact(v);
             }
         });
+
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor edit = pref.edit();
+
+        tvNumber = (EditText) findViewById(R.id.emergencyNumber_input);
+        tvNumber.setFocusableInTouchMode(false);
+        tvNumber.setFocusable(false);
+        tvNumber.setFocusableInTouchMode(true);
+        tvNumber.setFocusable(true);
+        tvNumber.setText(pref.getString(App.SETTING_EMGERGENCY_NUMBER,App.EMERGENCY_PHONE_NUMBER_DEFAULT));
+
+        btnNumber = (Button) findViewById(R.id.setNumber_btn);
+        btnNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                edit.putString(App.SETTING_EMGERGENCY_NUMBER, tvNumber.getText().toString());
+                edit.commit();
+            }
+        });
+
     }
 
     private void setupListViewListener() {

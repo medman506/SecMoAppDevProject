@@ -3,11 +3,13 @@ package ims.fhj.at.emergencyalerter.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter intentFilter;
 
     private MessageUtil messageUtil;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         // keep reference of activity object
         EmergencyApplication emergencyApplication = (EmergencyApplication) this.getApplicationContext();
         emergencyApplication.mainActivity = this;
-
+        prefs =  PreferenceManager.getDefaultSharedPreferences(this);
         messageUtil = MessageUtil.getInstance(getApplicationContext());
 
         locationUpdateReceiver = new LocationUpdateReceiver();
@@ -163,7 +166,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void startEmergencyPhoneCallPermissionGranted() {
         try {
-            Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(App.EMERGENCY_PHONE_NUMBER));
+            String number = "tel:"+prefs.getString(App.SETTING_EMGERGENCY_NUMBER,App.EMERGENCY_PHONE_NUMBER_DEFAULT);
+
+            Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(number));
             startActivity(callIntent);
         } catch (SecurityException e) {
             showEmergencyPermissionDenied();

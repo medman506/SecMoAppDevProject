@@ -4,7 +4,6 @@ package ims.fhj.at.emergencyalerter.util;
 import android.content.Context;
 import android.location.Location;
 import android.telephony.SmsManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 
