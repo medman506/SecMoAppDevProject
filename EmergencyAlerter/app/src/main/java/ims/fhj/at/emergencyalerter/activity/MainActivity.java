@@ -19,12 +19,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ims.fhj.at.emergencyalerter.EmergencyApplication;
 import ims.fhj.at.emergencyalerter.R;
+import ims.fhj.at.emergencyalerter.model.Contact;
 import ims.fhj.at.emergencyalerter.receiver.LocationUpdateReceiver;
 import ims.fhj.at.emergencyalerter.service.LocationService;
 import ims.fhj.at.emergencyalerter.util.App;
+import ims.fhj.at.emergencyalerter.util.DatabaseUtil;
 import ims.fhj.at.emergencyalerter.util.LocationTracker;
+import ims.fhj.at.emergencyalerter.util.MessageUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnToMapActivity;
     private Button btnToSettingsActivity;
     private Button btnStartEmergencyPhoneCall;
+    private Button btnSendEmergencyMessage;
 
     // location service intent
     private Intent serviceIntent;
@@ -44,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private LocationUpdateReceiver locationUpdateReceiver;
     private IntentFilter intentFilter;
 
+    private MessageUtil messageUtil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         // keep reference of activity object
         EmergencyApplication emergencyApplication = (EmergencyApplication) this.getApplicationContext();
         emergencyApplication.mainActivity = this;
+
+        messageUtil = MessageUtil.getInstance(getApplicationContext());
 
         locationUpdateReceiver = new LocationUpdateReceiver();
         intentFilter = new IntentFilter(App.BROADCAST_LOCATION_UPDATE);
@@ -88,6 +98,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // button to send emergency messages
+        btnSendEmergencyMessage = (Button) findViewById(R.id.panic_message);
+        btnSendEmergencyMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkSendMessagePermission();
+            }
+        });
+
         // set up location service
         serviceIntent = new Intent(this, LocationService.class);
         startService(serviceIntent);
@@ -111,7 +130,17 @@ public class MainActivity extends AppCompatActivity {
                     startEmergencyPhoneCallPermissionGranted();
                 } else {
                     // permission was denied, we may not be able to continue as planned
-                    startEmergencyPhoneCallPermissionDenied();
+                    showEmergencyPermissionDenied();
+                }
+                break;
+            case App.PERMISSION_REQUEST_SEND_SMS:
+                // if request was cancelled, all the arrays are empty
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, we can continue on
+                    startEmergencyMessagePermissionGranted();
+                } else {
+                    // permission was denied, we may not be able to continue as planned
+                    showEmergencyPermissionDenied();
                 }
                 break;
         }
@@ -137,13 +166,39 @@ public class MainActivity extends AppCompatActivity {
             Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(App.EMERGENCY_PHONE_NUMBER));
             startActivity(callIntent);
         } catch (SecurityException e) {
-            startEmergencyPhoneCallPermissionDenied();
+            showEmergencyPermissionDenied();
             e.printStackTrace();
         }
     }
 
-    private void startEmergencyPhoneCallPermissionDenied() {
-        Toast.makeText(this, "You didn't let us start a phone call. Good luck", Toast.LENGTH_LONG).show();
+    private void checkSendMessagePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            // should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)) {
+                // TODO show an explanation?
+            } else {
+                // no explanation needed, we can request the permission
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, App.PERMISSION_REQUEST_SEND_SMS);
+            }
+        } else {
+            // we have the permission, start the phone call
+            startEmergencyMessagePermissionGranted();
+        }
+    }
+
+    private void startEmergencyMessagePermissionGranted() {
+        try {
+            ArrayList<Contact> contacts = DatabaseUtil.getInstance(getApplicationContext()).getContacts();
+           messageUtil.sendEmergencyMessage(contacts, locationTracker.getLocation());
+
+        } catch (SecurityException e) {
+            showEmergencyPermissionDenied();
+            e.printStackTrace();
+        }
+    }
+
+    private void showEmergencyPermissionDenied() {
+        Toast.makeText(this, "You did not grant the necessary Permissions. Good luck anyways!", Toast.LENGTH_LONG).show();
     }
 
     public void setCurrentLocation(Location location) {

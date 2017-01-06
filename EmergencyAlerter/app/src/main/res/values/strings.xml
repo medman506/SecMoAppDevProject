@@ -6,6 +6,8 @@
     <string name="nearby_police_stations_looking">Looking for nearby police stations...</string>
     <string name="show_settings">Settings</string>
     <string name="send_panic_message">ALERT</string>
-    <string name="send_panic_call">Call</string>
+    <string name="send_panic_call">Panic Call</string>
     <string name="add_contact">Add Emergency Contact</string>
+    <string name="emergency_message">This is an emergency Message! I need help!\n</string>
+    <string name="emergency_message_location">My last known position:\n</string>
 </resources>
