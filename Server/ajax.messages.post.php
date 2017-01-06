@@ -7,13 +7,13 @@
 	// get id to delete
 	if ($_GET) {
 		// "lat" => arrival
-		$arrival = strip_tags($_GET['lat']);
+		$arrival = $_GET['lat'];
 		
 		// "lng" => sender/from
-		$sender = strip_tags($_GET['lng']);
+		$sender = $_GET['lng'];
 		
 		// "radius" => message body
-		$body = strip_tags($_GET['radius']);
+		$body = $_GET['radius'];
 		
 		// get DB connection
 		$db = $dbc->getConnection();
