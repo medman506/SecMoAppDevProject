@@ -126,6 +126,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        // check for location permission on app start
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, App.PERMISSION_REQUEST_FINE_LOCATION);
+        }
+
         // police station retriever
         policeStationRetriever = new PoliceStationRetriever(this);
     }
@@ -135,7 +140,10 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
         Log.d(TAG, "onDestroy");
-        stopService(serviceIntent);
+        
+        if (serviceIntent != null) {
+            stopService(serviceIntent);
+        }
     }
 
     @Override
@@ -175,6 +183,12 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startServicesAndListeners();
+        }
+    }
+
+    private void startServicesAndListeners() {
         // set up location service
         serviceIntent = new Intent(this, LocationService.class);
         startService(serviceIntent);
