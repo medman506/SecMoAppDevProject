@@ -124,6 +124,16 @@ public class MainActivity extends AppCompatActivity {
             public void onNetworkChanged(String name, long connectTime, String info) {
                 handleNetworkChangedEvent(name, connectTime, info);
             }
+
+            @Override
+            public void onNetworkDown() {
+                // TODO handle network down event?
+            }
+
+            @Override
+            public void onNetworkUp() {
+                // TODO handle network up event?
+            }
         };
 
         // check for location permission on app start
