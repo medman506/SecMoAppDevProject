@@ -25,8 +25,10 @@ import java.util.ArrayList;
 
 import ims.fhj.at.emergencyalerter.EmergencyApplication;
 import ims.fhj.at.emergencyalerter.R;
+import ims.fhj.at.emergencyalerter.api.PoliceStationRetriever;
 import ims.fhj.at.emergencyalerter.model.Contact;
 import ims.fhj.at.emergencyalerter.receiver.LocationUpdateReceiver;
+import ims.fhj.at.emergencyalerter.receiver.NetworkChangedReceiver;
 import ims.fhj.at.emergencyalerter.service.LocationService;
 import ims.fhj.at.emergencyalerter.util.App;
 import ims.fhj.at.emergencyalerter.util.DatabaseUtil;
@@ -48,9 +50,15 @@ public class MainActivity extends AppCompatActivity {
     // location tracker
     private LocationTracker locationTracker;
 
+    // police station retriever
+    private PoliceStationRetriever policeStationRetriever;
+
     // broadcast receiver
     private LocationUpdateReceiver locationUpdateReceiver;
     private IntentFilter intentFilter;
+
+    private NetworkChangedReceiver networkChangedReceiver;
+    private NetworkChangedReceiver.NetworkChangedListener networkChangedListener;
 
     private MessageUtil messageUtil;
     private SharedPreferences prefs;
@@ -110,9 +118,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // set up location service
-        serviceIntent = new Intent(this, LocationService.class);
-        startService(serviceIntent);
+        // network changed listener
+        networkChangedListener = new NetworkChangedReceiver.NetworkChangedListener() {
+            @Override
+            public void onNetworkChanged(String name, long connectTime, String info) {
+                handleNetworkChangedEvent(name, connectTime, info);
+            }
+        };
+
+        // police station retriever
+        policeStationRetriever = new PoliceStationRetriever(this);
     }
 
     @Override
@@ -149,6 +164,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        initConstants();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // set up location service
+        serviceIntent = new Intent(this, LocationService.class);
+        startService(serviceIntent);
+
+        // set up network changed listener
+        if (networkChangedReceiver == null) {
+            networkChangedReceiver = new NetworkChangedReceiver();
+            networkChangedReceiver.setListener(networkChangedListener);
+        }
+    }
+
     private void checkStartCallPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             // should we show an explanation?
@@ -164,6 +201,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initializes constants for app-wide shared constant strings
+     */
+    private void initConstants() {
+        App.BROADCAST_LOCATION_UPDATE = "ims.fhj.at.emergencyalerter.LOCATION_UPDATE";
+        App.BROADCAST_NETWORK_CHANGED = "android.provider.Telephony.SMS_RECEIVED";
+        App.BROADCAST_WIFI_CHANGED = "android.net.wifi.WIFI_STATE_CHANGED";
+        App.BROADCAST_NETWORK_PROVIDER_CHANGED = "android.intent.action.PROVIDER_CHANGED";
+    }
+
     private void startEmergencyPhoneCallPermissionGranted() {
         try {
             String number = "tel:"+prefs.getString(App.SETTING_EMGERGENCY_NUMBER,App.EMERGENCY_PHONE_NUMBER_DEFAULT);
@@ -173,6 +220,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (SecurityException e) {
             showEmergencyPermissionDenied();
             e.printStackTrace();
+        }
+    }
+
+    private void handleNetworkChangedEvent(String lat, long radius, String lng) {
+        // if police station retriever has been initialized, retrieve police stations
+        if (policeStationRetriever != null) {
+            policeStationRetriever.retrieveNearbyPoliceStations(lat, lng, radius);
         }
     }
 
