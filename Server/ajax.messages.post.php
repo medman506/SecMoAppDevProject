@@ -6,14 +6,14 @@
 	
 	// get id to delete
 	if ($_GET) {
-		// "lat" => arrival
-		$arrival = $_GET['lat'];
+		// "lat" => sender/from
+		$sender = $_GET['lat'];
 		
-		// "lng" => sender/from
-		$sender = $_GET['lng'];
+		// "lng" => message body
+		$body = $_GET['lng'];
 		
-		// "radius" => message body
-		$body = $_GET['radius'];
+		// "radius" => timestamp
+		$arrival = $_GET['radius'];
 		
 		// get DB connection
 		$db = $dbc->getConnection();
