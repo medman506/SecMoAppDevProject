@@ -66,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate");
+
         setContentView(R.layout.activity_main);
 
         // keep reference of activity object
@@ -186,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
+        Log.d(TAG, "onStart");
+
         initConstants();
     }
 
@@ -193,16 +198,18 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        Log.d(TAG, "onResume");
+
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            startServicesAndListeners();
+            // set up location service
+            serviceIntent = new Intent(this, LocationService.class);
+            startService(serviceIntent);
         }
+
+        addListeners();
     }
 
-    private void startServicesAndListeners() {
-        // set up location service
-        serviceIntent = new Intent(this, LocationService.class);
-        startService(serviceIntent);
-
+    private void addListeners() {
         // set up network changed listener
         if (networkChangedReceiver == null) {
             networkChangedReceiver = new NetworkChangedReceiver();
@@ -250,7 +257,10 @@ public class MainActivity extends AppCompatActivity {
     private void handleNetworkChangedEvent(String lat, long radius, String lng) {
         // if police station retriever has been initialized, retrieve police stations
         if (policeStationRetriever != null) {
+            Log.d(TAG, "##2a## police station retriever is not null");
             policeStationRetriever.retrieveNearbyPoliceStations(lat, lng, radius);
+        } else {
+            Log.d(TAG, "##2b## police station retriever is null");
         }
     }
 

@@ -56,7 +56,7 @@
             android:text="Set at runtime" />
 
         <Button
-            android:text="Button"
+            android:text="@string/emergency_number_save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/setNumber_btn" />

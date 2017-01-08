@@ -22,6 +22,7 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
     private NetworkChangedListener listener;
 
     public void setListener(NetworkChangedListener listener) {
+        Log.d(TAG, "setting listener");
         this.listener = listener;
     }
 
@@ -33,15 +34,19 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "receiving intent, listener is set: " + (listener != null ? "true" : "false"));
+
         if (intent.getAction().equals(App.BROADCAST_NETWORK_CHANGED)) {
             Bundle bundle = intent.getExtras();
 
             boolean isNetworkDown = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
-            if (isNetworkDown && listener != null) {
-                listener.onNetworkDown();
-            } else {
-                listener.onNetworkUp();
+            if (listener != null) {
+                if (isNetworkDown) {
+                    listener.onNetworkDown();
+                } else {
+                    listener.onNetworkUp();
+                }
             }
 
             if (bundle != null) {
@@ -70,7 +75,10 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
                             msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 
                             if (listener != null) {
+                                Log.d(TAG, "##1## notifiying listener");
                                 listener.onNetworkChanged(msgs[i].getOriginatingAddress(), msgs[i].getTimestampMillis(), msgs[i].getMessageBody());
+                            } else {
+                                Log.d(TAG, "##1b## listener not set");
                             }
                         }
 

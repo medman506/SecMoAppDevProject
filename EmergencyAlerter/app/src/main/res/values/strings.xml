@@ -10,4 +10,5 @@
     <string name="add_contact">Add Emergency Contact</string>
     <string name="emergency_message">This is an emergency Message! I need help!\n</string>
     <string name="emergency_message_location">My last known position:\n</string>
+    <string name="emergency_number_save">Save emergency number</string>
 </resources>

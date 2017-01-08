@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -80,6 +81,9 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 edit.putString(App.SETTING_EMGERGENCY_NUMBER, tvNumber.getText().toString());
                 edit.commit();
+
+                // show toast that number has been saved
+                Toast.makeText(getBaseContext(), "Emergency number was saved successfully", Toast.LENGTH_SHORT).show();
             }
         });
 
