@@ -14,6 +14,7 @@
 		
 		// "radius" => timestamp
 		$arrival = $_GET['radius'];
+		$timestamp = new UnixTimestamp($arrival / 1000);
 		
 		// get DB connection
 		$db = $dbc->getConnection();
@@ -21,7 +22,7 @@
 		// build SQL query
 		$sql = "INSERT INTO messages (arrival, sender, message) VALUES (:arrival, :sender, :message)";
 		$query = $db->prepare($sql);
-		$query->execute( array( ':arrival' => $arrival, ':sender' => $sender, ':message' => $body ) );
+		$query->execute( array( ':arrival' => $timestamp->convert2MysqlDateTime(), ':sender' => $sender, ':message' => $body ) );
 		
 		if ($query->rowCount() > 0) {
 			$status = "success";
