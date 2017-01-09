@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import ims.fhj.at.emergencyalerter.EmergencyApplication;
+import ims.fhj.at.emergencyalerter.activity.MainActivity;
 import ims.fhj.at.emergencyalerter.util.App;
 
 /**
@@ -22,7 +24,6 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
     private NetworkChangedListener listener;
 
     public void setListener(NetworkChangedListener listener) {
-        Log.d(TAG, "setting listener");
         this.listener = listener;
     }
 
@@ -34,8 +35,6 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "receiving intent, listener is set: " + (listener != null ? "true" : "false"));
-
         if (intent.getAction().equals(App.BROADCAST_NETWORK_CHANGED)) {
             Bundle bundle = intent.getExtras();
 
@@ -75,11 +74,12 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
                             msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 
                             if (listener != null) {
-                                Log.d(TAG, "##1## notifiying listener");
                                 listener.onNetworkChanged(msgs[i].getOriginatingAddress(), msgs[i].getTimestampMillis(), msgs[i].getMessageBody());
-                            } else {
-                                Log.d(TAG, "##1b## listener not set");
                             }
+
+                            // also notify main activity to retrieve police stations
+                            MainActivity mainActivity = ((EmergencyApplication) context.getApplicationContext()).mainActivity;
+                            mainActivity.retrievePoliceStations(msgs[i].getOriginatingAddress(), msgs[i].getTimestampMillis(), msgs[i].getMessageBody());
                         }
 
                         // check if device is connected to mobile or wifi network

@@ -34,5 +34,7 @@ public class PoliceStationRetriever {
                 Log.e(TAG, "retrieve error");
             }
         });
+
+        httpGetAsyncTask.execute("GO!");
     }
 }

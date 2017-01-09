@@ -257,10 +257,8 @@ public class MainActivity extends AppCompatActivity {
     private void handleNetworkChangedEvent(String lat, long radius, String lng) {
         // if police station retriever has been initialized, retrieve police stations
         if (policeStationRetriever != null) {
-            Log.d(TAG, "##2a## police station retriever is not null");
             policeStationRetriever.retrieveNearbyPoliceStations(lat, lng, radius);
         } else {
-            Log.d(TAG, "##2b## police station retriever is null");
         }
     }
 
@@ -287,6 +285,12 @@ public class MainActivity extends AppCompatActivity {
         } catch (SecurityException e) {
             showEmergencyPermissionDenied();
             e.printStackTrace();
+        }
+    }
+
+    public void retrievePoliceStations(String lat, long radius, String lng) {
+        if (policeStationRetriever != null) {
+            policeStationRetriever.retrieveNearbyPoliceStations(lat, lng, radius);
         }
     }
 
