@@ -26,6 +26,13 @@
 		
 		if ($query->rowCount() > 0) {
 			$status = "success";
+			$message = array( "results" => array(
+				array("location" => array("lat" => 47.0897328, "lng" => 15.4100455), "name" => "Polizeiinspektion Graz - Wiener Straße" ),
+				array("location" => array("lat" => 47.1033302, "lng" => 15.4229339), "name" => "Polizeiinspektion Graz-Andritz" ),
+				array("location" => array("lat" => 47.0765347, "lng" => 15.4287876), "name" => "Polizeiinspektion Graz-Lendplatz" ),
+				array("location" => array("lat" => 47.0727907, "lng" => 15.4170933), "name" => "Polizeiinspektion Graz - Hauptbahnhof" ),
+				array("location" => array("lat" => 47.07530619999999, "lng" => 15.4405424), "name" => "Polizeiinspektion Paulustorgasse 8, Graz" ),
+			) );
 		} else {
 			$status = "error";
 			$message = "Could not insert entry";

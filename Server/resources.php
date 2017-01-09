@@ -1,6 +1,7 @@
 <?php
 	// require source files
 	require_once('db_connection.php');
+	require_once('time.format.php');
 
 	// Default time zone
 	date_default_timezone_set("Europe/Vienna");
